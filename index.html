@@ -134,13 +134,15 @@
 
   // اگر اپلیکیشن از آیکون نصب‌شده اجرا شده باشد
   const standalone =
-    window.matchMedia("(display-mode: standalone)").matches ||
-    window.navigator.standalone === true;
+  window.matchMedia("(display-mode: standalone)").matches ||
+  window.navigator.standalone === true;
 
-  if (standalone) {
-    installBtn.hidden = true;
-    window.location.replace(MAIN_URL);
-  }
+const launchedFromPWA =
+  new URLSearchParams(window.location.search).get("source") === "pwa";
+
+if (standalone || launchedFromPWA) {
+  window.location.replace(MAIN_URL);
+}
 
   // ثبت Service Worker
   if ("serviceWorker" in navigator) {
