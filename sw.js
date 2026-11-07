@@ -1,24 +1,67 @@
-const CACHE_NAME = 'persiajam-main-pwa-v1';
-const APP_SHELL = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
+const CACHE_NAME = "persiajam-main-v7";
+
+const STATIC_ASSETS = [
+  "./",
+  "./manifest.webmanifest",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png"
 ];
-self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
+
+// نصب نسخه جدید
+self.addEventListener("install", (event) => {
   self.skipWaiting();
-});
-self.addEventListener('activate', event => {
+
   event.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))))
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(STATIC_ASSETS);
+    })
   );
-  self.clients.claim();
 });
-self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url);
-  if (url.origin === self.location.origin) {
-    event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request)));
+
+// حذف کش‌های قدیمی
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => caches.delete(key))
+      );
+    }).then(() => self.clients.claim())
+  );
+});
+
+// درخواست‌های صفحه و فایل‌های ثابت
+self.addEventListener("fetch", (event) => {
+  const request = event.request;
+
+  if (request.method !== "GET") return;
+
+  const url = new URL(request.url);
+
+  // درخواست‌های خارج از دامنه خود PWA دست‌کاری نشوند
+  if (url.origin !== self.location.origin) return;
+
+  // صفحه HTML همیشه از شبکه دریافت شود
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request).catch(() => {
+        return new Response(
+          "اتصال به اینترنت برقرار نیست. لطفاً دوباره تلاش کنید.",
+          {
+            status: 503,
+            headers: { "Content-Type": "text/plain; charset=utf-8" }
+          }
+        );
+      })
+    );
+    return;
   }
+
+  // فایل‌های ثابت از کش یا شبکه
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      return cached || fetch(request);
+    })
+  );
 });
