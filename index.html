@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#123b32">
+  <title>صندوق قرض‌الحسنه کارکنان پرشیا جام</title>
+
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon-192.png">
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #123b32;
+      color: white;
+      font-family: Tahoma, Arial, sans-serif;
+      text-align: center;
+    }
+
+    p {
+      font-size: 16px;
+    }
+  </style>
+
+  <script>
+    const MAIN_URL = "https://script.google.com/macros/s/AKfycbwpubZnu6HvBSwllBInGJrLHFr2bkf7-mr7xGdp0kbgxjxgLYeH0oIfF5JPtcsUzwRv0w/exec";
+
+    // ثبت Service Worker بدون متوقف کردن انتقال
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("./sw.js")
+          .catch(() => {});
+      });
+    }
+
+    // انتقال مستقیم به سامانه اصلی
+    window.location.replace(MAIN_URL);
+  </script>
+</head>
+
+<body>
+  <p>در حال ورود به سامانه اصلی صندوق…</p>
+</body>
+</html>
