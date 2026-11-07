@@ -90,6 +90,9 @@
       line-height: 2;
       color: #e2e9e6;
     }
+    body.pwa-launch {
+  display: none !important;
+}
   </style>
 </head>
 
@@ -133,26 +136,27 @@
     const hint = document.getElementById("hint");
 
     const isStandalone =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      window.matchMedia("(display-mode: fullscreen)").matches ||
-      window.navigator.standalone === true;
+  window.matchMedia("(display-mode: standalone)").matches ||
+  window.matchMedia("(display-mode: fullscreen)").matches ||
+  window.navigator.standalone === true;
 
-    const launchSource =
-      new URLSearchParams(window.location.search).get("source");
+const launchSource =
+  new URLSearchParams(window.location.search).get("source");
 
-    // اجرای اپلیکیشن نصب‌شده: ورود مستقیم به سامانه
-    if (isStandalone || launchSource === "pwa") {
-      window.location.replace(MAIN_URL);
-    } else {
-      // ثبت Service Worker فقط در صفحه مرورگر
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("./sw.js")
-            .catch(() => {});
-        });
-      }
-    }
+// اجرای اپلیکیشن نصب‌شده: ورود مستقیم به سامانه
+if (isStandalone || launchSource === "pwa") {
+  document.body.classList.add("pwa-launch");
+  window.location.replace(MAIN_URL);
+} else {
+  // ثبت Service Worker فقط در صفحه مرورگر
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("./sw.js")
+        .catch(() => {});
+    });
+  }
+}
 
     let deferredPrompt = null;
 
