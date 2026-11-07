@@ -2,19 +2,17 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0B315B">
+  <meta name="description" content="سامانه صندوق قرض‌الحسنه کارکنان پرشیا جام">
 
   <title>صندوق قرض‌الحسنه کارکنان پرشیا جام</title>
 
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/png" href="./icons/icon-192.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -22,9 +20,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 22px;
       background: linear-gradient(145deg, #0B315B, #123b32);
-      color: #ffffff;
+      color: white;
       font-family: Tahoma, Arial, sans-serif;
       text-align: center;
     }
@@ -33,19 +31,19 @@
       width: 100%;
       max-width: 420px;
       padding: 32px 24px;
-      border: 1px solid rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,.18);
       border-radius: 22px;
-      background: rgba(255,255,255,0.09);
-      box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+      background: rgba(255,255,255,.09);
+      box-shadow: 0 12px 35px rgba(0,0,0,.2);
     }
 
     .logo {
-      width: 116px;
-      height: 116px;
+      width: 120px;
+      height: 120px;
       object-fit: contain;
-      margin-bottom: 18px;
       border-radius: 50%;
       background: white;
+      margin-bottom: 18px;
     }
 
     h1 {
@@ -81,7 +79,7 @@
     }
 
     .login {
-      background: #ffffff;
+      background: white;
       color: #123b32;
     }
 
@@ -100,7 +98,7 @@
     <img
       class="logo"
       src="./icons/icon-192.png"
-      alt="لوگوی صندوق قرض‌الحسنه کارکنان پرشیا جام"
+      alt="لوگوی صندوق پرشیا جام"
     >
 
     <h1>صندوق قرض‌الحسنه کارکنان پرشیا جام</h1>
@@ -121,69 +119,71 @@
     </a>
 
     <div id="hint" class="hint">
-      برای نصب اپلیکیشن، از گزینه نصب در مرورگر استفاده کنید.
+      برای نصب، از دکمه نصب یا منوی مرورگر استفاده کنید.
     </div>
   </main>
 
-<script>
-  const MAIN_URL =
-    "https://script.google.com/macros/s/AKfycbwpubZnu6HvBSwllBInGJrLHFr2bkf7-mr7xGdp0kbgxjxgLYeH0oIfF5JPtcsUzwRv0w/exec";
+  <script>
+    "use strict";
 
-  const installBtn = document.getElementById("installBtn");
-  const hint = document.getElementById("hint");
+    const MAIN_URL =
+      "https://script.google.com/macros/s/AKfycbwpubZnu6HvBSwllBInGJrLHFr2bkf7-mr7xGdp0kbgxjxgLYeH0oIfF5JPtcsUzwRv0w/exec";
 
-  // اگر اپلیکیشن از آیکون نصب‌شده اجرا شده باشد
-  const standalone =
-  window.matchMedia("(display-mode: standalone)").matches ||
-  window.navigator.standalone === true;
+    const installBtn = document.getElementById("installBtn");
+    const hint = document.getElementById("hint");
 
-const launchedFromPWA =
-  new URLSearchParams(window.location.search).get("source") === "pwa";
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.matchMedia("(display-mode: fullscreen)").matches ||
+      window.navigator.standalone === true;
 
-if (standalone || launchedFromPWA) {
-  window.location.replace(MAIN_URL);
-}
+    const launchSource =
+      new URLSearchParams(window.location.search).get("source");
 
-  // ثبت Service Worker
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("./sw.js")
-        .catch(() => {});
-    });
-  }
-
-  // دریافت درخواست نصب Chrome
-  let deferredPrompt = null;
-
-  window.addEventListener("beforeinstallprompt", (event) => {
-    event.preventDefault();
-    deferredPrompt = event;
-    installBtn.hidden = false;
-    hint.textContent = "برای نصب، دکمه زیر را انتخاب کنید.";
-  });
-
-  // اجرای نصب با دکمه
-  installBtn.addEventListener("click", async () => {
-    if (!deferredPrompt) {
-      hint.textContent =
-        "برای نصب، از منوی Chrome گزینه Install and create shortcut را انتخاب کنید.";
-      return;
+    // اجرای اپلیکیشن نصب‌شده: ورود مستقیم به سامانه
+    if (isStandalone || launchSource === "pwa") {
+      window.location.replace(MAIN_URL);
+    } else {
+      // ثبت Service Worker فقط در صفحه مرورگر
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("./sw.js")
+            .catch(() => {});
+        });
+      }
     }
 
-    try {
-      deferredPrompt.prompt();
+    let deferredPrompt = null;
 
-      const result = await deferredPrompt.userChoice;
-
-      if (result.outcome === "accepted") {
-        hint.textContent = "درخواست نصب تأیید شد.";
-      } else {
-        hint.textContent = "نصب لغو شد.";
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      deferredPrompt = event;
+      installBtn.hidden = false;
+      hint.textContent = "برای نصب، دکمه زیر را انتخاب کنید.";
+    });
+    installBtn.addEventListener("click", async () => {
+      if (!deferredPrompt) {
+        hint.textContent =
+          "از منوی Chrome گزینه نصب اپلیکیشن را انتخاب کنید.";
+        return;
       }
 
+      const promptEvent = deferredPrompt;
       deferredPrompt = null;
       installBtn.hidden = true;
+
+      try {
+        await promptEvent.prompt();
+        const result = await promptEvent.userChoice;
+
+        hint.textContent =
+          result.outcome === "accepted"
+            ? "درخواست نصب تأیید شد."
+            : "نصب لغو شد.";
+      } catch (error) {
+        hint.textContent = "برای نصب از منوی Chrome استفاده کنید.";
+      }
     });
 
     window.addEventListener("appinstalled", () => {
