@@ -179,21 +179,15 @@
       } else {
         hint.textContent = "نصب لغو شد.";
       }
-    } catch (error) {
-      hint.textContent = "نصب از طریق منوی مرورگر انجام دهید.";
-    }
 
-    deferredPrompt = null;
-    installBtn.hidden = true;
-  });
+      deferredPrompt = null;
+      installBtn.hidden = true;
+    });
 
-  // پس از نصب
-  window.addEventListener("appinstalled", () => {
-    installBtn.hidden = true;
-    hint.textContent = "اپلیکیشن صندوق نصب شد.";
-  });
-</script>
+    window.addEventListener("appinstalled", () => {
+      installBtn.hidden = true;
+      hint.textContent = "اپلیکیشن صندوق نصب شد.";
+    });
+  </script>
 </body>
 </html>
-
-      const result = await deferredPrompt.userChoice;
