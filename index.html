@@ -125,63 +125,74 @@
     </div>
   </main>
 
-  <script>
-    const MAIN_URL =
-      "https://script.google.com/macros/s/AKfycbwpubZnu6HvBSwllBInGJrLHFr2bkf7-mr7xGdp0kbgxjxgLYeH0oIfF5JPtcsUzwRv0w/exec";
+<script>
+  const MAIN_URL =
+    "https://script.google.com/macros/s/AKfycbwpubZnu6HvBSwllBInGJrLHFr2bkf7-mr7xGdp0kbgxjxgLYeH0oIfF5JPtcsUzwRv0w/exec";
 
-    const installBtn = document.getElementById("installBtn");
-    const hint = document.getElementById("hint");
+  const installBtn = document.getElementById("installBtn");
+  const hint = document.getElementById("hint");
 
-    // Detect an installed PWA and open the main login page
-    const isStandalone =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      window.navigator.standalone === true;
+  // اگر اپلیکیشن از آیکون نصب‌شده اجرا شده باشد
+  const standalone =
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true;
 
-    if (isStandalone) {
-      window.location.replace(MAIN_URL);
-    }
+  if (standalone) {
+    installBtn.hidden = true;
+    window.location.replace(MAIN_URL);
+  }
 
-    // Register the service worker
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("./sw.js")
-          .catch(() => {});
-      });
-    }
-
-    // Capture the browser's native installation prompt
-    let deferredPrompt = null;
-
-    window.addEventListener("beforeinstallprompt", (event) => {
-      event.preventDefault();
-      deferredPrompt = event;
-      installBtn.hidden = false;
-      hint.textContent = "برای نصب، دکمه زیر را انتخاب کنید.";
+  // ثبت Service Worker
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("./sw.js")
+        .catch(() => {});
     });
+  }
 
-    installBtn.addEventListener("click", async () => {
-      if (!deferredPrompt) {
-        hint.textContent =
-          "از منوی Chrome گزینه Install app را انتخاب کنید.";
-        return;
-      }
+  // دریافت درخواست نصب Chrome
+  let deferredPrompt = null;
 
-      deferredPrompt.prompt();if (result.outcome === "accepted") {
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredPrompt = event;
+    installBtn.hidden = false;
+    hint.textContent = "برای نصب، دکمه زیر را انتخاب کنید.";
+  });
+
+  // اجرای نصب با دکمه
+  installBtn.addEventListener("click", async () => {
+    if (!deferredPrompt) {
+      hint.textContent =
+        "برای نصب، از منوی Chrome گزینه Install and create shortcut را انتخاب کنید.";
+      return;
+    }
+
+    try {
+      deferredPrompt.prompt();
+
+      const result = await deferredPrompt.userChoice;
+
+      if (result.outcome === "accepted") {
         hint.textContent = "درخواست نصب تأیید شد.";
       } else {
-        hint.textContent = "نصب لغو شد. هر زمان خواستید دوباره اقدام کنید.";
+        hint.textContent = "نصب لغو شد.";
       }
+    } catch (error) {
+      hint.textContent = "نصب از طریق منوی مرورگر انجام دهید.";
+    }
 
-      deferredPrompt = null;
-      installBtn.hidden = true;
-    });
+    deferredPrompt = null;
+    installBtn.hidden = true;
+  });
 
-    window.addEventListener("appinstalled", () => {
-      installBtn.hidden = true;
-      hint.textContent = "اپلیکیشن صندوق نصب شد.";
-    });
-  </script>
+  // پس از نصب
+  window.addEventListener("appinstalled", () => {
+    installBtn.hidden = true;
+    hint.textContent = "اپلیکیشن صندوق نصب شد.";
+  });
+</script>
 </body>
 </html>
 
