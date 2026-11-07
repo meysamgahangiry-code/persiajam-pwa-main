@@ -2,12 +2,14 @@
   "id": "./",
   "name": "صندوق قرض‌الحسنه کارکنان پرشیا جام",
   "short_name": "صندوق پرشیا جام",
+  "description": "سامانه مدیریت صندوق قرض‌الحسنه کارکنان پرشیا جام",
   "lang": "fa",
   "dir": "rtl",
-  "start_url": "./?source=pwa",
+  "start_url": "./?source=pwa&v=7",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "background_color": "#0B315B",
   "theme_color": "#0B315B",
   "icons": [
     {
